@@ -1,9 +1,9 @@
 import { FC } from 'react'
 
-const App: FC = () => {
+const ShowBooks: FC = () => {
     return (
         <p className='py-5 text-center text-primary h1'>Find books</p>
     )
 }
 
-export default App
+export default ShowBooks

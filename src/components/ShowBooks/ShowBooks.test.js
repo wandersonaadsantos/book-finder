@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
-import App from './App'
+import ShowBooks from './ShowBooks'
 
-describe('testing on App component', () => {
+describe('testing on ShowBooks component', () => {
     test('render and check text "Find books"', () => {
-        render(<App />)
+        render(<ShowBooks />)
         expect(screen.getByText(/Find books/)).toBeInTheDocument()
     })
 })
