@@ -1,70 +1,73 @@
-# Getting Started with Create React App
+# book-finder
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Book finder.
 
-## Available Scripts
+To build this project you will require: NodeJS - version 18 and Yarn or NPM
 
-In the project directory, you can run:
+## Commands
 
-### `yarn start`
+Running local:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+ - Before eveything run: `cp .env.local .env`. This will create the .env file with the variables needed to run locally.
+ - `yarn be4-install`: First installation of all the dependencies and setup husky
+ - `yarn be4-commit`: Run all unit test and linter before commit to ensure will not break husky or CI/CD pipeline
+ - `yarn start`: Run in develop mode
+ - `yarn build`: Clean the build folder and builds all the static assets for the project within the /build folder
+ - `yarn test`: Runs all the unit tests
+ - `yarn lint:js`: Runs the code linter on all js files
+ - `yarn lint:scss`: Runs the code linter on all scss files
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Important:
 
-### `yarn test`
+I am using node-sass to enable SCSS modules, node-sass require a correctly version of Node to work properly:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+NodeJS  | Minimum node-sass version | Node Module
+--------|--------------------------|------------
+Node 20 | 9.0+                     | 115
+Node 19 | 8.0+                     | 111
+Node 18 | 8.0+                     | 108
+Node 17 | 7.0+,<8.0                | 102
+Node 16 | 6.0+                     | 93
+Node 15 | 5.0+,<7.0                | 88
+Node 14 | 4.14+,<9.0               | 83
 
-### `yarn build`
+As my machine is currently running Node 18, my node-sass is config as 8.0.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Git Hooks:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Set husky:
+ - `yarn husky install`
+ - `yarn husky add .husky/pre-commit "yarn lint-staged"`
+ - `yarn husky add .husky/pre-push "yarn test"`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The project count with Husky and Lint Staged:
+ - `pre-commit`: Run all scripts on lint-staged
+    - `lint-staged`: Run all linters and add to commit if something be fix
+ - `pre-push`: Run all unit tests.
 
-### `yarn eject`
+## Project structure
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+ - `src`: JavaScript source code of the application
+ - `public`: HTML template
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Challenge
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+A restful JSON API is provided at `http://nyx.vima.ekt.gr:3000`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Requirements:
 
-## Learn More
+1. Using React, build a webapp that queries this paginated endpoint and prints out the results as a list
+2. The app should be paginated (page selector) with the pagination reflected in the url (so when the page is
+refreshed the same resultset is shown)
+3. You can use React Bootstrap as a components library for simplicity
+4. Compile your own Bootstrap theme (less/sass) with the only difference to the original that the primary
+colour is `#1D7874`
+5. Host your code on github or similar, put all the code in a Pull Request against the (probably) empty repo
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* Optional
+Add a search field to the app that upon request populates the `filters` post param as follows:
+filters:[{type: "all", values: ["YOUR_SEARCH_FIELD_CONTENTS"]}]
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Development URLs
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Home screen: `http://localhost:3000/`
