@@ -1,18 +1,40 @@
-import { FC } from 'react'
+import { FC, useState, useEffect } from 'react'
+import { changeUrl, getURLParameters, validNumber } from '../../utils'
+import FinderNav from './FinderNav'
+import Params from './interface'
 import Cards from './Cards'
 import schema from './data'
 
 const ShowBooks: FC = () => {
-    if (!schema) return null
-    const { fakeResp, title } = schema
+    const [allParams, setAllParams] = useState<Params>({
+        pageNumb: 1,
+        filter: '',
+        searchFilter: ''
+    })
+    const lastPage: number = Math.ceil(schema?.count / 20)
+    const { pageNumb, searchFilter } = allParams
+    const handleParams = (obj: Partial<Params>) => setAllParams({ ...allParams, ...obj })
+    const decreIncre = (isSubtract?: boolean) => handleParams({ pageNumb: isSubtract ? pageNumb - 1 : pageNumb + 1 })
+
+    useEffect(() => {
+        const { page } = getURLParameters()
+        if (validNumber(Number(page))) handleParams({ pageNumb: Number(page) })
+    }, [])
+
+    useEffect(() => {
+        // console.log({ page: pageNumb, filters: [{ type: 'all', values: [validChar(searchFilter) ? `${searchFilter}` : ''] }] })
+        changeUrl(`/?page=${pageNumb}`)
+    }, [pageNumb, searchFilter])
+
     return (
         <div className='container py-5'>
-            <div className='row'>
-                <div className='col-12'>
-                    <p className='text-center h1 text-primary mb-5'>{title}</p>
-                </div>
-            </div>
-            <Cards books={fakeResp?.books} />
+            <FinderNav
+                allParams={allParams}
+                handleParams={handleParams}
+                lastPage={lastPage}
+                handleClick={(isSubtract?: boolean) => decreIncre(!!isSubtract)}
+            />
+            <Cards books={schema?.books} />
         </div>
     )
 }
