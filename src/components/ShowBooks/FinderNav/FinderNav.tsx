@@ -1,56 +1,54 @@
 import { FC } from 'react'
+import { Row, Col, InputGroup, FormControl, Button, ButtonGroup } from 'react-bootstrap'
 import FinderNavProps from './interface'
 
 const FinderNav: FC<FinderNavProps> = ({ lastPage, handleClick, allParams, handleParams }) => {
     if (!handleClick || !handleParams) return null
     const { pageNumb, filter } = allParams
     return (
-        <div className='row mb-5'>
-            <div className='col-12'>
+        <Row className='mb-5'>
+            <Col xs={12}>
                 <p className='text-center h1 text-primary mb-5'>Find books</p>
-            </div>
-            <div className='col-12 col-md-6 text-center text-md-start'>
-                <section className='w-100 mb-3'>
-                    <input
+            </Col>
+            <Col xs={12} md={6} className='text-center text-md-start'>
+                <InputGroup>
+                    <FormControl
                         placeholder='Search for a book'
-                        className='px-3 text-center me-3 h6 py-1'
                         value={filter}
                         onChange={(ev) => handleParams({ filter: ev.target.value })}
                     />
-                    <button
-                        type='button'
-                        className='btn btn-primary h6'
-                        onClick={() => handleParams({ pageNumb: 1, searchFilter: filter })}
-                    >
+                    <Button variant="primary" onClick={() => handleParams({ pageNumb: 1, searchFilter: filter })}>
                         Search
-                    </button>
-                </section>
-            </div>
-            <div className='col text-center'>
+                    </Button>
+                </InputGroup>
+            </Col>
+            <Col className='text-center'>
                 <p className='bg-secondary p-1 mb-3 text-light'>{'Max page: '}{lastPage}</p>
-            </div>
-            <div className='col text-center'>
+            </Col>
+            <Col className='text-center'>
                 <p className='bg-secondary p-1 mb-3 text-light'>{'Page: '}{pageNumb}</p>
-            </div>
-            <div className='col-12 col-md-2'>
+            </Col>
+            <Col xs={12} md={2}>
                 <section className='w-100 mb-3 text-md-end text-center'>
-                    <button
-                        type='button'
-                        className={`btn btn-primary h6 ${pageNumb <= 1 ? 'disabled' : ''}`}
-                        onClick={() => handleClick(true)}
-                    >
-                        Prev
-                    </button>
-                    <button
-                        type='button'
-                        className={`btn btn-outline-primary h6 ms-3 ${lastPage <= pageNumb ? 'disabled' : ''}`}
-                        onClick={() => handleClick()}
-                    >
-                        Next
-                    </button>
+                    <ButtonGroup>
+                        <Button
+                            variant="secondary"
+                            disabled={pageNumb <= 1}
+                            onClick={() => handleClick(true)}
+                        >
+                            Prev
+                        </Button>
+                        <Button
+                            variant="primary"
+                            disabled={lastPage <= pageNumb}
+                            onClick={() => handleClick()}
+                        >
+                            Next
+                        </Button>
+                    </ButtonGroup>
                 </section>
-            </div>
-        </div>
+            </Col>
+        </Row>
     )
 }
 

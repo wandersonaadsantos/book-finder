@@ -3,6 +3,7 @@ import { changeUrl, getURLParameters, validPageNumb, validChar } from '../../uti
 import { useGetBooksMutation } from '../../store/actions'
 import LoadingPage from '../Generics/LoadingPage'
 import ErrorPage from '../Generics/ErrorPage'
+import { Container } from 'react-bootstrap'
 import FinderNav from './FinderNav'
 import Params from './interface'
 import Cards from './Cards'
@@ -17,10 +18,6 @@ const ShowBooks: FC = () => {
     const lastPage: number = Math.ceil((data?.count || 1) / 20)
     const { pageNumb, searchFilter } = allParams
     const handleParams = (obj: Partial<Params>) => setAllParams({ ...allParams, ...obj })
-    const decreIncre = (isSubtract?: boolean) => {
-        if ((!isSubtract && pageNumb === lastPage) || (isSubtract && pageNumb === 1)) return null
-        return handleParams({ pageNumb: isSubtract ? pageNumb - 1 : pageNumb + 1 })
-    }
 
     useEffect(() => {
         const { page } = getURLParameters()
@@ -28,22 +25,23 @@ const ShowBooks: FC = () => {
     }, [])
 
     useEffect(() => {
-        getContent({ page: pageNumb, filters: [{ type: 'all', values: [validChar(searchFilter) ? `${searchFilter}` : ''] }] })
+        const finalParam = validChar(searchFilter) ? { filters: [{ type: 'all', values: [searchFilter] }] } : {}
+        getContent({ page: pageNumb, ...finalParam })
         changeUrl(`/?page=${pageNumb}`)
     }, [pageNumb, searchFilter])
 
     if (error) return <ErrorPage err={`${JSON.stringify(error)}`} />
     if (isLoading || !data) return <LoadingPage />
     return (
-        <div className='container py-5'>
+        <Container className='py-5'>
             <FinderNav
                 allParams={allParams}
                 handleParams={handleParams}
                 lastPage={lastPage}
-                handleClick={(isSubtract?: boolean) => decreIncre(!!isSubtract)}
+                handleClick={(isSubtract?: boolean) => handleParams({ pageNumb: !!isSubtract ? pageNumb - 1 : pageNumb + 1 })}
             />
             <Cards books={data?.books} />
-        </div>
+        </Container>
     )
 }
 

@@ -1,11 +1,12 @@
 import { FC } from 'react'
+import { Row, Col } from 'react-bootstrap'
 
 const NoResults: FC = () => (
-    <div className='row'>
-        <div className='col-12'>
+    <Row>
+        <Col>
             <p className='text-center py-5'>No books found</p>
-        </div>
-    </div>
+        </Col>
+    </Row>
 )
 
 export default NoResults
