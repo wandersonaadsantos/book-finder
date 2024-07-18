@@ -1,9 +1,11 @@
 import { FC, useState, useEffect } from 'react'
-import { changeUrl, getURLParameters, validNumber } from '../../utils'
+import { changeUrl, getURLParameters, validPageNumb, validChar } from '../../utils'
+import { useGetBooksMutation } from '../../store/actions'
+import LoadingPage from '../Generics/LoadingPage'
+import ErrorPage from '../Generics/ErrorPage'
 import FinderNav from './FinderNav'
 import Params from './interface'
 import Cards from './Cards'
-import schema from './data'
 
 const ShowBooks: FC = () => {
     const [allParams, setAllParams] = useState<Params>({
@@ -11,21 +13,27 @@ const ShowBooks: FC = () => {
         filter: '',
         searchFilter: ''
     })
-    const lastPage: number = Math.ceil(schema?.count / 20)
+    const [getContent, { data, isLoading, error }] = useGetBooksMutation()
+    const lastPage: number = Math.ceil((data?.count || 1) / 20)
     const { pageNumb, searchFilter } = allParams
     const handleParams = (obj: Partial<Params>) => setAllParams({ ...allParams, ...obj })
-    const decreIncre = (isSubtract?: boolean) => handleParams({ pageNumb: isSubtract ? pageNumb - 1 : pageNumb + 1 })
+    const decreIncre = (isSubtract?: boolean) => {
+        if ((!isSubtract && pageNumb === lastPage) || (isSubtract && pageNumb === 1)) return null
+        return handleParams({ pageNumb: isSubtract ? pageNumb - 1 : pageNumb + 1 })
+    }
 
     useEffect(() => {
         const { page } = getURLParameters()
-        if (validNumber(Number(page))) handleParams({ pageNumb: Number(page) })
+        if (validPageNumb(Number(page))) handleParams({ pageNumb: Number(page) })
     }, [])
 
     useEffect(() => {
-        // console.log({ page: pageNumb, filters: [{ type: 'all', values: [validChar(searchFilter) ? `${searchFilter}` : ''] }] })
+        getContent({ page: pageNumb, filters: [{ type: 'all', values: [validChar(searchFilter) ? `${searchFilter}` : ''] }] })
         changeUrl(`/?page=${pageNumb}`)
     }, [pageNumb, searchFilter])
 
+    if (error) return <ErrorPage err={`${JSON.stringify(error)}`} />
+    if (isLoading || !data) return <LoadingPage />
     return (
         <div className='container py-5'>
             <FinderNav
@@ -34,7 +42,7 @@ const ShowBooks: FC = () => {
                 lastPage={lastPage}
                 handleClick={(isSubtract?: boolean) => decreIncre(!!isSubtract)}
             />
-            <Cards books={schema?.books} />
+            <Cards books={data?.books} />
         </div>
     )
 }

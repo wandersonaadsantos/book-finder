@@ -37,14 +37,14 @@ const FinderNav: FC<FinderNavProps> = ({ lastPage, handleClick, allParams, handl
                     <button
                         type='button'
                         className={`btn btn-primary h6 ${pageNumb <= 1 ? 'disabled' : ''}`}
-                        onClick={() => !(pageNumb === 1) && handleClick(true)}
+                        onClick={() => handleClick(true)}
                     >
                         Prev
                     </button>
                     <button
                         type='button'
                         className={`btn btn-outline-primary h6 ms-3 ${lastPage <= pageNumb ? 'disabled' : ''}`}
-                        onClick={() => !(pageNumb === lastPage) && handleClick()}
+                        onClick={() => handleClick()}
                     >
                         Next
                     </button>

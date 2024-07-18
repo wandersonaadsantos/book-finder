@@ -1,61 +1,71 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
+import { renderWithProviders } from '../../utils/testutils'
+import server from '../../utils/server'
+import { rest } from 'msw'
 import ShowBooks from './'
 
 describe('testing on ShowBooks component', () => {
     beforeEach(() => { window.history.pushState(null, '', '/?page=1') })
-    test('renders ShowBooks with title "Find books"', () => {
-        render(<ShowBooks />)
-        expect(screen.getByText(/Find books/)).toBeInTheDocument()
+    test('renders ShowBooks with title "Find books"', async () => {
+        renderWithProviders(<ShowBooks />)
+        expect(screen.getByText(/Loading .../i)).toBeInTheDocument()
+        expect(await screen.findByText(/Find books/)).toBeInTheDocument()
     })
-    test('navigates between pages when "prev" and "next" buttons are clicked', () => {
-        render(<ShowBooks />)
+    test('navigates between pages when "prev" and "next" buttons are clicked', async () => {
+        renderWithProviders(<ShowBooks />)
         // Check starts on page 1
-        expect(screen.getByText(/Page: 1/)).toBeInTheDocument()
+        expect(await screen.findByText(/Page: 1/)).toBeInTheDocument()
         // Click next button
-        fireEvent.click(screen.getByText(/Next/))
+        fireEvent.click(await screen.findByText(/Next/))
         // Check if it is page 2
-        expect(screen.getByText(/Page: 2/)).toBeInTheDocument()
+        expect(await screen.findByText(/Page: 2/)).toBeInTheDocument()
         // Click prev button
-        fireEvent.click(screen.getByText(/Prev/))
+        fireEvent.click(await screen.findByText(/Prev/))
         // Check if it is page 1 again
-        expect(screen.getByText(/Page: 1/)).toBeInTheDocument()
+        expect(await screen.findByText(/Page: 1/)).toBeInTheDocument()
     })
-    test('must start on page 1 and cannot be less than that', () => {
-        render(<ShowBooks />)
+    test('must start on page 1 and cannot be less than that', async () => {
+        renderWithProviders(<ShowBooks />)
         //check starts on page 1
-        expect(screen.getByText(/Page: 1/)).toBeInTheDocument()
+        expect(await screen.findByText(/Page: 1/)).toBeInTheDocument()
         // click prev button
-        fireEvent.click(screen.getByText(/Prev/))
+        fireEvent.click(await screen.findByText(/Prev/))
         //check if it is page 1 again
-        expect(screen.getByText(/Page: 1/)).toBeInTheDocument()
+        expect(await screen.findByText(/Page: 1/)).toBeInTheDocument()
     })
-    test('must start on page 122 and cannot be more than that', () => {
+    test('must start on page 122 and cannot be more than that', async () => {
         window.history.pushState(null, '', '/?page=122')
-        render(<ShowBooks />)
+        renderWithProviders(<ShowBooks />)
         //check starts on page 122
-        expect(screen.getByText(/Page: 122/)).toBeInTheDocument()
+        expect(await screen.findByText(/Page: 122/)).toBeInTheDocument()
         // click prev button
-        fireEvent.click(screen.getByText(/Next/))
+        fireEvent.click(await screen.findByText(/Next/))
         //check if it is page 122 again
-        expect(screen.getByText(/Page: 122/)).toBeInTheDocument()
+        expect(await screen.findByText(/Page: 122/)).toBeInTheDocument()
     })
-    test('should call handleChanges correctly', () => {
-        render(<ShowBooks />)
-        const searchInput = screen.getByPlaceholderText(/Search for a book/)
+    test('should call handleChanges correctly', async () => {
+        renderWithProviders(<ShowBooks />)
+        const searchInput = await screen.findByPlaceholderText(/Search for a book/)
         fireEvent.change(searchInput, { target: { value: 'New Book' } })
         expect(searchInput.value).toBe('New Book')
     })
-    test('should search for New Book', () => {
+    test('should search for New Book', async () => {
         window.history.pushState(null, '', '/?page=3')
-        render(<ShowBooks />)
-        const searchInput = screen.getByPlaceholderText(/Search for a book/)
+        renderWithProviders(<ShowBooks />)
+        const searchInput = await screen.findByPlaceholderText(/Search for a book/)
         fireEvent.change(searchInput, { target: { value: 'New Book' } })
-        fireEvent.click(screen.getByText(/Search/))
-        expect(screen.getByText(/Page: 1/)).toBeInTheDocument()
+        fireEvent.click(await screen.findByText(/Search/))
+        expect(await screen.findByText(/Page: 1/)).toBeInTheDocument()
     })
-    test('it receives page as invalid number, handlePage corrects it to page 1', () => {
+    test('it receives page as invalid number, handlePage corrects it to page 1', async () => {
         window.history.pushState(null, '', '/?page={safhskfjsd}')
-        render(<ShowBooks />)
-        expect(screen.getByText(/Page: 1/)).toBeInTheDocument()
+        renderWithProviders(<ShowBooks />)
+        expect(await screen.findByText(/Page: 1/)).toBeInTheDocument()
+    })
+    test('handles error response', async () => {
+        // force msw to return error response
+        server.use(rest.post('*books/', (_, res, ctx) => res(ctx.status(500))))
+        renderWithProviders(<ShowBooks />)
+        expect(await screen.findByText(/Something went wrong!!/i)).toBeInTheDocument()
     })
 })
