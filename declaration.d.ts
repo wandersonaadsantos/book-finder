@@ -1,6 +1,7 @@
 // declaration.d.ts
 
 // packages
+declare module 'uuid'
 
 // styles
 declare module '*.scss'
